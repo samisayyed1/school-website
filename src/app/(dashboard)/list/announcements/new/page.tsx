@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { notify } from "@/lib/notifications";
 
 async function postAnnouncement(formData: FormData) {
   "use server";
@@ -25,6 +26,22 @@ async function postAnnouncement(formData: FormData) {
     target_role,
     created_by: user.id,
   });
+
+  // Fan-out notifications (best-effort, env-gated)
+  let recipientsQ = supabase.from("profiles").select("notification_email, notification_phone");
+  if (target_role) recipientsQ = recipientsQ.eq("role", target_role);
+  const { data: recipients } = await recipientsQ;
+  for (const r of recipients ?? []) {
+    notify(
+      { email: r.notification_email, phone: r.notification_phone },
+      {
+        subject: `📢 ${title}`,
+        html: `<p><strong>${title}</strong></p>${body ? `<p>${body.replace(/\n/g, "<br/>")}</p>` : ""}<p>— The VIP School of Excellence</p>`,
+        text: `${title}${body ? "\n\n" + body : ""}`,
+        whatsapp: `VIP School: ${title}${body ? " — " + body : ""}`,
+      }
+    ).catch(() => {});
+  }
 
   revalidatePath("/list/announcements");
   revalidatePath("/student");

@@ -10,6 +10,8 @@ export type Profile = {
   phone: string | null;
   avatar_url: string | null;
   workspace_email: string | null;
+  notification_email: string | null;
+  notification_phone: string | null;
 };
 
 export async function getCurrentUser() {
@@ -28,7 +30,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   if (!user) return null;
   const { data } = await supabase
     .from("profiles")
-    .select("id,email,full_name,role,phone,avatar_url,workspace_email")
+    .select("id,email,full_name,role,phone,avatar_url,workspace_email,notification_email,notification_phone")
     .eq("id", user.id)
     .single();
   return (data as Profile) ?? null;

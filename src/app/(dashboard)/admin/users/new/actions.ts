@@ -100,6 +100,22 @@ export async function createUserAction(
     })
     .eq("id", created.user.id);
 
+  // Step 5: also seed the role-specific detail row so the user is usable
+  // immediately (rosters, attendance, fees, etc.).
+  if (role === "student") {
+    const admissionNo = `VIP-${new Date().getFullYear()}-${Math.floor(Math.random() * 90000 + 10000)}`;
+    await admin.from("students").insert({
+      profile_id: created.user.id,
+      admission_no: admissionNo,
+    });
+  } else if (role === "teacher") {
+    const empId = `T-${Math.floor(Math.random() * 9000 + 1000)}`;
+    await admin.from("teachers").insert({
+      profile_id: created.user.id,
+      employee_id: empId,
+    });
+  }
+
   revalidatePath("/admin/users");
   redirect("/admin/users");
 }

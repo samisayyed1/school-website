@@ -24,9 +24,9 @@ const menuItems: MenuSection[] = [
     title: "MENU",
     items: [
       { label: "Dashboard", href: "/", icon: <IconHome />, visible: ALL },
-      { label: "Users", href: "/admin/users", icon: <IconUsers />, visible: ["admin", "principal"] },
       { label: "Homework", href: "/homework", icon: <IconBook />, visible: ALL },
       { label: "Attendance", href: "/list/attendance", icon: <IconCheck />, visible: ALL },
+      { label: "Exams", href: "/exams", icon: <IconAward />, visible: ["teacher", "coordinator", "principal"] },
       { label: "Results", href: "/list/results", icon: <IconAward />, visible: ALL },
       { label: "Fees", href: "/list/fees", icon: <IconRupee />, visible: ["admin", "principal", "student", "parent"] },
       { label: "Announcements", href: "/list/announcements", icon: <IconMegaphone />, visible: ALL },
@@ -34,8 +34,16 @@ const menuItems: MenuSection[] = [
     ],
   },
   {
+    title: "MANAGE",
+    items: [
+      { label: "Users", href: "/admin/users", icon: <IconUsers />, visible: ["admin", "principal"] },
+      { label: "Classes", href: "/admin/classes", icon: <IconClasses />, visible: ["admin", "principal", "coordinator"] },
+    ],
+  },
+  {
     title: "OTHER",
     items: [
+      { label: "Profile", href: "/profile", icon: <IconAvatar />, visible: ALL },
       { label: "Settings", href: "/settings", icon: <IconGear />, visible: ALL },
     ],
   },
@@ -154,6 +162,21 @@ function IconGear() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+    </svg>
+  );
+}
+function IconClasses() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+      <path d="M3 4h18M3 9h18M3 14h18M3 19h18" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconAvatar() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 4-7 8-7s8 3 8 7" strokeLinecap="round" />
     </svg>
   );
 }
