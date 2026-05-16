@@ -1,111 +1,59 @@
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { eventsData, role } from "@/lib/data";
-import Image from "next/image";
 import Link from "next/link";
+import { requireProfile } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { PageHeader, EmptyState } from "@/components/dashboard/PageHeader";
 
-type Event = {
-  id: number;
-  title: string;
-  class: number;
-  date: string;
-  startTime: string;
-  endTime: string;
-};
+export default async function EventsPage() {
+  const profile = await requireProfile();
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("events")
+    .select("id, title, description, start_at, end_at, location, profiles:created_by(full_name)")
+    .order("start_at", { ascending: true });
 
-const columns = [
-  {
-    header: "Title",
-    accessor: "title",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Date",
-    accessor: "date",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Start Time",
-    accessor: "startTime",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "End Time",
-    accessor: "endTime",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
-];
-
-const EventListPage = () => {
-  const renderRow = (item: Event) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="flex items-center gap-4 p-4">{item.title}</td>
-      <td>{item.class}</td>
-      <td className="hidden md:table-cell">{item.date}</td>
-      <td className="hidden md:table-cell">{item.startTime}</td>
-      <td className="hidden md:table-cell">{item.endTime}</td>
-
-      {/* actions */}
-      <td>
-        <div className="flex items-center gap-2">
-          <Link href={`/list/teachers/${item.id}`}>
-            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky">
-              <Image alt="" src="/view.png" width={16} height={16} />
-            </button>
-          </Link>
-          {role === "admin" && (
-            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
-              <Image alt="" src="/delete.png" width={16} height={16} />
-            </button>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
-
+  const canPost = ["teacher", "coordinator", "principal", "admin"].includes(profile.role);
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* Top */}
-      <div className="flex justify-between items-center">
-        <h1 className="hidden md:block text-lg font-semibold">All Events</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {role === "admin" && (
-              <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-                <Image src="/plus.png" alt="" width={14} height={14} />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* List */}
-      <div className="">
-        <Table columns={columns} renderRow={renderRow} data={eventsData} />
-      </div>
-
-      {/* Pagination */}
-      <Pagination />
+    <div className="p-6 space-y-6">
+      <PageHeader
+        title="Events"
+        subtitle="Holidays, exams, ceremonies, and school activities."
+        action={
+          canPost ? (
+            <Link
+              href="/list/events/new"
+              className="inline-flex items-center gap-2 rounded-full bg-vip-emerald text-white text-sm font-semibold px-5 py-2.5 hover:bg-vip-emeraldDark"
+            >
+              + Add event
+            </Link>
+          ) : undefined
+        }
+      />
+      {(data ?? []).length === 0 ? (
+        <EmptyState title="No events scheduled" />
+      ) : (
+        <ul className="space-y-3">
+          {(data as any[]).map((e) => (
+            <li
+              key={e.id}
+              className="rounded-2xl bg-white dark:bg-zinc-900 border border-vip-emerald/10 dark:border-zinc-800 p-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{e.title}</h3>
+                  {e.description && (
+                    <p className="mt-1 text-sm text-vip-muted dark:text-zinc-300">{e.description}</p>
+                  )}
+                  <div className="mt-2 text-xs text-vip-muted dark:text-zinc-500 flex flex-wrap gap-3">
+                    <span>📅 {new Date(e.start_at).toLocaleString()}</span>
+                    {e.location && <span>📍 {e.location}</span>}
+                    <span>by {e.profiles?.full_name ?? "—"}</span>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default EventListPage;
+}

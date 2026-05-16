@@ -1,97 +1,63 @@
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { announcementsData, eventsData, role } from "@/lib/data";
-import Image from "next/image";
 import Link from "next/link";
+import { requireProfile } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { PageHeader, EmptyState } from "@/components/dashboard/PageHeader";
 
-type Announcement = {
-  id: number;
-  title: string;
-  class: number;
-  date: string;
-};
+export default async function AnnouncementsPage() {
+  const profile = await requireProfile();
+  const supabase = createClient();
 
-const columns = [
-  {
-    header: "Title",
-    accessor: "title",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Date",
-    accessor: "date",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
-];
+  const { data } = await supabase
+    .from("announcements")
+    .select("id, title, body, target_role, created_at, profiles:created_by(full_name)")
+    .order("created_at", { ascending: false });
 
-const AnnouncementListPage = () => {
-  const renderRow = (item: Announcement) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="flex items-center gap-4 p-4">{item.title}</td>
-      <td>{item.class}</td>
-      <td className="hidden md:table-cell">{item.date}</td>
-
-      {/* actions */}
-      <td>
-        <div className="flex items-center gap-2">
-          <Link href={`/list/teachers/${item.id}`}>
-            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky">
-              <Image alt="" src="/view.png" width={16} height={16} />
-            </button>
-          </Link>
-          {role === "admin" && (
-            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
-              <Image alt="" src="/delete.png" width={16} height={16} />
-            </button>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+  const canPost = ["teacher", "coordinator", "principal", "admin"].includes(profile.role);
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* Top */}
-      <div className="flex justify-between items-center">
-        <h1 className="hidden md:block text-lg font-semibold">All Announcements</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {role === "admin" && (
-              <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-                <Image src="/plus.png" alt="" width={14} height={14} />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+    <div className="p-6 space-y-6">
+      <PageHeader
+        title="Announcements"
+        subtitle="Important updates from the school."
+        action={
+          canPost ? (
+            <Link
+              href="/list/announcements/new"
+              className="inline-flex items-center gap-2 rounded-full bg-vip-emerald text-white text-sm font-semibold px-5 py-2.5 shadow-soft hover:bg-vip-emeraldDark"
+            >
+              + New announcement
+            </Link>
+          ) : undefined
+        }
+      />
 
-      {/* List */}
-      <div className="">
-        <Table columns={columns} renderRow={renderRow} data={announcementsData} />
-      </div>
-
-      {/* Pagination */}
-      <Pagination />
+      {(data ?? []).length === 0 ? (
+        <EmptyState title="No announcements yet" body={canPost ? "Post the first one." : "Stay tuned."} />
+      ) : (
+        <ul className="space-y-3">
+          {(data as any[]).map((a) => (
+            <li
+              key={a.id}
+              className="rounded-2xl bg-white dark:bg-zinc-900 border border-vip-emerald/10 dark:border-zinc-800 p-5"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold text-lg">{a.title}</h3>
+                {a.target_role && (
+                  <span className="text-xs uppercase tracking-wider rounded-full bg-vip-emerald/10 text-vip-emerald px-2.5 py-0.5">
+                    {a.target_role}
+                  </span>
+                )}
+              </div>
+              {a.body && (
+                <p className="mt-2 text-sm text-vip-muted dark:text-zinc-300 whitespace-pre-wrap">{a.body}</p>
+              )}
+              <div className="mt-3 text-xs text-vip-muted dark:text-zinc-500">
+                {a.profiles?.full_name ?? "—"} · {new Date(a.created_at).toLocaleString()}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default AnnouncementListPage;
+}

@@ -29,11 +29,111 @@ export default function Home() {
       <Hero />
       <Stats />
       <About />
+      <Pillars />
       <Academics />
+      <Voices />
       <Admissions />
+      <Faq />
       <Contact />
       <Footer />
     </main>
+  );
+}
+
+function Pillars() {
+  const pillars = [
+    { letter: "T", title: "Tarbiyah", body: "Character first — every lesson shapes adab, manners, and discipline alongside academics." },
+    { letter: "T", title: "Ta'leem", body: "Rigorous, joyful learning. CBSE-aligned curriculum delivered through digital boards and small-group attention." },
+    { letter: "T", title: "Taqwa", body: "Quran Shareef Taleem is woven into the day — not an afterthought, but a foundation." },
+    { letter: "T", title: "Tahzeeb", body: "Cultured, respectful, articulate. We graduate children, not just students." },
+    { letter: "T", title: "Tahafuz", body: "A safe, capped class size, AC environment. Every parent's trust is sacred." },
+  ];
+  return (
+    <section className="py-24 sm:py-32 bg-white">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10">
+        <SectionHeading
+          eyebrow="Our 5 Pillars"
+          title="Why parents choose VIP."
+          subtitle="The five principles every classroom, teacher, and decision is held against."
+        />
+        <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {pillars.map((p) => (
+            <div
+              key={p.title}
+              className="group relative rounded-2xl bg-vip-cream border border-vip-emerald/10 p-6 hover:border-vip-gold/40 hover:bg-white transition"
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-vip-emerald text-vip-gold font-bold text-lg">
+                {p.letter}
+              </span>
+              <h3 className="mt-4 text-lg font-semibold tracking-tight">{p.title}</h3>
+              <p className="mt-2 text-sm text-vip-muted leading-relaxed">{p.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Voices() {
+  return (
+    <section className="py-24 sm:py-32 bg-vip-emeraldDark text-white relative overflow-hidden">
+      <div className="absolute inset-0 vip-pattern" />
+      <div className="relative mx-auto max-w-4xl px-6 lg:px-10 text-center">
+        <div className="text-xs uppercase tracking-[0.22em] text-vip-goldSoft">From the families we serve</div>
+        <blockquote className="mt-8 text-2xl sm:text-3xl font-medium leading-relaxed">
+          &ldquo;My daughter actually <em className="text-vip-goldSoft not-italic">looks forward</em> to school. She knows her teachers by name, she recites her surahs at home, and her English has transformed in one term. This is what we hoped for.&rdquo;
+        </blockquote>
+        <div className="mt-8 text-sm text-white/70">
+          A parent of Class 3 · Nizamabad
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Faq() {
+  const items = [
+    {
+      q: "When do admissions open and how do I apply?",
+      a: "Admissions for the 2026–27 academic year are open now. Seats are limited per class (max 30). Call us on 99123 88801 or 99123 88806, or walk in to the campus on Bodhan Road to collect the application form and schedule the scholarship exam.",
+    },
+    {
+      q: "How is the fee structure?",
+      a: "Our fees are deliberately reasonable for the quality offered. We also run a scholarship exam — select students qualify for fee concessions. Full structure is shared on enquiry at the office.",
+    },
+    {
+      q: "How is the Quran Taleem integrated?",
+      a: "Quran Shareef, Arabic basics, Islamic studies, and Akhlaq are scheduled as full subjects alongside English, Maths, Science, Social Studies, and Computer — not as a separate add-on class.",
+    },
+    {
+      q: "Do you offer transport?",
+      a: "Not at this time. Most students live within easy reach of the Bodhan Road campus.",
+    },
+    {
+      q: "Will my child use a parent portal?",
+      a: "Yes. Parents get a dedicated portal to follow attendance, fees, homework, results, and announcements — all in one place, with WhatsApp + email updates.",
+    },
+  ];
+  return (
+    <section className="py-24 sm:py-32 bg-white">
+      <div className="mx-auto max-w-3xl px-6 lg:px-10">
+        <SectionHeading eyebrow="Questions" title="Things parents ask us." />
+        <div className="mt-12 divide-y divide-vip-emerald/10">
+          {items.map((it) => (
+            <details key={it.q} className="group py-5">
+              <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-semibold text-vip-ink">
+                <span>{it.q}</span>
+                <span className="h-6 w-6 flex items-center justify-center rounded-full border border-vip-emerald/30 text-vip-emerald transition group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-vip-muted leading-relaxed">{it.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
