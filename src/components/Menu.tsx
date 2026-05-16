@@ -19,6 +19,7 @@ const menuItems: MenuSection[] = [
     title: "MENU",
     items: [
       { icon: "/home.png", label: "Dashboard", href: "/", visible: ["admin", "principal", "coordinator", "teacher", "student", "parent"] },
+      { icon: "/profile.png", label: "Users", href: "/admin/users", visible: ["admin", "principal"] },
       { icon: "/teacher.png", label: "Teachers", href: "/list/teachers", visible: ["admin", "principal", "coordinator"] },
       { icon: "/student.png", label: "Students", href: "/list/students", visible: ["admin", "principal", "coordinator", "teacher"] },
       { icon: "/parent.png", label: "Parents", href: "/list/parents", visible: ["admin", "principal", "coordinator", "teacher"] },
